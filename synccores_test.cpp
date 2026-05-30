@@ -5,7 +5,7 @@
 #include <intrin.h>
 
 #include "synccores.h"
-#define MAX_LOOPS (1000000)
+#define MAX_LOOPS (100000)
 
 #define RELEASE_ASSERT(condition) \
     do { \
