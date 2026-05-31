@@ -8,11 +8,6 @@
 //ensure proper cachelining in a production environment:
 static std::atomic<CoreStateType> state[MAX_CORES] = { 0 };
 /***********************************************************************/
-CoreStateType SyncCores_GetState(uint32_t coreId)
-{
-    return state[coreId].load(std::memory_order_acquire);
-}
-/***********************************************************************/
 void SyncCores(unsigned int currentCoreId)
 {
     auto my_state = state[currentCoreId].fetch_add(1, std::memory_order_acq_rel) + 1;
@@ -23,6 +18,11 @@ void SyncCores(unsigned int currentCoreId)
             /*empty*/
         }
     }
+}
+/***********************************************************************/
+CoreStateType SyncCores_GetState(uint32_t coreId)
+{
+    return state[coreId].load(std::memory_order_acquire);
 }
 /***********************************************************************/
 void SyncCores_Init()

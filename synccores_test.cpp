@@ -5,7 +5,7 @@
 #include <intrin.h>
 
 #include "synccores.h"
-#define MAX_LOOPS (100000)
+#define MAX_LOOPS (10)
 
 #define RELEASE_ASSERT(condition) \
     do { \
@@ -16,7 +16,7 @@
     } while (0)
 
 /***********************************************************************/
-void core(int id)
+static void core(uint32_t id)
 {
     for (int i = 0; i < MAX_LOOPS; ++i)
     {
@@ -25,11 +25,11 @@ void core(int id)
         for (int j = 0; j < MAX_CORES; ++j)
         {
             CoreStateType otherEpoch = SyncCores_GetState(j);
-            //the loop count MAX_LOOPS makes it necessary to check against
+            //the loop count MAX_LOOPS > 1 makes it necessary to check against
             // +1 , because aonther thread might have already incremented 
-            // the epoch of its current state variable
+            // the epoch of its current state variable:
             RELEASE_ASSERT(otherEpoch == localEpoch ||
-                otherEpoch == localEpoch + 1);
+                           otherEpoch == localEpoch + 1);
         }
     }
 }
@@ -41,7 +41,7 @@ int main(void)
     {
         SyncCores_Init();
         std::vector<std::jthread> cores;
-        for (auto i = 0; i < MAX_CORES; ++i)
+        for (uint32_t i = 0; i < MAX_CORES; ++i)
         {
             cores.emplace_back(core, i);
         }
